@@ -19,8 +19,13 @@
 
 import numpy
 import numpy.linalg
+import scipy.optimize
 
 
+def regularize(U,s,V,filters,err):
+    residual = lambda mu : numpy.linalg.norm(numpy.dot(numpy.diag(filters(mu) - numpy.ones(10)) , U.T  ))
+    to_be_zero = lambda mu: residual(mu) - err
+    param = (to_be_zero,s[0])   #TODO: user fprime: the derivative of to_be_zero
 
 def solve(A,b,err,method="newtik"):
     (n,m) = A.shape
@@ -28,7 +33,8 @@ def solve(A,b,err,method="newtik"):
     new_b = numpy.transpose(U) * b
     dirty_x = V * ( s ** (-1) ) * new_b 
     if method.lower() == "newtik":
-        pass
+        filters = lambda mu : s / ( s**2 + mu **2 )
+        
     elif method.lower() == "tik":
         pass
     elif method.lower() == "tsvd":
