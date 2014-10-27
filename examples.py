@@ -82,10 +82,14 @@ def example(name,N,rel_err,eta=1):
     # plot the solutions
     for method in [ 'real', 'tsvd', 'tik', 'newtik' ]:
         pylab.plot(tilde_x[method],colors[method],label=method)
-    pylab.legend(loc='upper right')
+    if name is 'shaw':
+        pylab.legend(loc='upper left')
+    else:
+        pylab.legend(loc='upper right')
     pylab.title(name+" " + str( rel_err*100 ) + "%")
     pylab.savefig(name+'_'+str(int(rel_err*1000))+'.png')
     #pylab.show()
+    pylab.clf()
     
     return errors
 
@@ -124,7 +128,7 @@ if __name__ == "__main__":
         outfile.write('\\begin{tabular} { c | c | c | c }\n')
         outfile.write('err. & TSVD & st. Tik & new Tik \\\\ \hline \n')
         for err in [.001,.01,.05,.1]:
-            outfile.write ( str(err*100)+'\\% & '+str(data[name][err]['tsvd'])+' & ' +str(data[name][err]['tik'])+' & ' +str(data[name][err]['newtik'])+' \\\\\n' )
+            outfile.write ( str(err*100)+'\\% & $'+str(data[name][err]['tsvd'])+'$ & $' +str(data[name][err]['tik'])+'$ & $' +str(data[name][err]['newtik'])+'$ \\\\\n' )
         outfile.write('\\end{tabular}\n')
         outfile.close()
     

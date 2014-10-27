@@ -19,7 +19,7 @@
 
 import numpy
 import numpy.linalg
-import scipy.optimize
+#import scipy.optimize
 
 #import pylab as pl
 
