@@ -1,14 +1,38 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2014 - Enrico Polesel
+# 
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# any later version.
+# 
+# This software is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this software. If not, see <http://www.gnu.org/licenses/>.
+
+
+
 import sys
+import csv
 
 import numpy
 import numpy.linalg
 import pylab
 
+# my library
 import reg
 
+# because i need pytave
 sys.path.insert(0,"./lib/")
 import pytave
 
+# because i use regtools
 pytave.addpath('./lib/regu/')
 
 N = 200
@@ -21,7 +45,7 @@ def example(name,N,rel_err,eta=1):
     elif name=='ilaplace':
         (A,b,x,tLAP) = pytave.feval(4,'i_laplace',N,1)
     else:
-        raise Exception("I don't know method "+name)
+        raise Exception("I don't know problem "+name)
     
     # 1 dimension arrays are 2dim in octave. Let's flat them!
     b = b.flatten()
@@ -61,7 +85,7 @@ def example(name,N,rel_err,eta=1):
     pylab.legend(loc='upper right')
     pylab.title(name+" " + str( rel_err*100 ) + "%")
     pylab.savefig(name+'_'+str(int(rel_err*1000))+'.png')
-    pylab.show()
+    #pylab.show()
     
     return errors
 
@@ -84,4 +108,24 @@ if __name__ == "__main__":
             for method in [ 'tsvd', 'tik', 'newtik' ]:
                 print (str(data[name][err][method])+"\t")
         print ("\n")
+    
+    for name in data.keys():
+        outfile = open(name+'.csv','w')
+        outwriter = csv.writer (outfile)
+        for err in [.001,.01,.05,.1]:
+            row = [str(err*100)+'%']
+            for method in [ 'tsvd', 'tik', 'newtik' ]:
+                row.append(str(data[name][err][method]))
+            outwriter.writerow(row)
+        outfile.close()
+    
+    for name in data.keys():
+        outfile = open(name+'.tex','w')
+        outfile.write('\\begin{tabular} { c | c | c | c }\n')
+        outfile.write('err. & TSVD & st. Tik & new Tik \\\\ \hline \n')
+        for err in [.001,.01,.05,.1]:
+            outfile.write ( str(err*100)+'\\% & '+str(data[name][err]['tsvd'])+' & ' +str(data[name][err]['tik'])+' & ' +str(data[name][err]['newtik'])+' \\\\\n' )
+        outfile.write('\\end{tabular}\n')
+        outfile.close()
+    
     
